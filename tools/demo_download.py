@@ -4,8 +4,8 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 # 配置部分
-URL_FILE = 'E:\FILES\WorkSpace\Coding\project\songSim\StyleListTabDelimited2output.txt'  # 包含 URL 的文件
-DOWNLOAD_DIR = 'E:\FILES\WorkSpace\Coding\project\songSim\demoMusic'  # 下载内容的目录
+URL_FILE = r"E:\FILES\WorkSpace\Coding\project\songSim\not_downloaded.txt"  # 包含 URL 的文件
+DOWNLOAD_DIR = r'E:\FILES\WorkSpace\Coding\project\songSim\demoMusic'  # 下载内容的目录
 MAX_THREADS = 10  # 最大线程数
 
 # 确保下载目录存在

@@ -19,11 +19,12 @@ def extract_first_column(file_path, output_file):
     for line in lines:
         first_item = line.split('\t')[0]
         # 使用正则表达式去除前面的非字母数字字符
-        match = re.search(r'_(.*)', first_item)
-        if match:
-            cleaned_item = '_' + match.group(1)
-        else:
-            cleaned_item = first_item
+        # match = re.search(r'_(.*)', first_item)
+        # if match:
+        #     cleaned_item = '_' + match.group(1)
+        # else:
+        #     cleaned_item = first_item
+        cleaned_item = first_item
         first_column_data.append(cleaned_item)
 
     with open(output_file, 'w', encoding='utf-8') as output:
@@ -33,4 +34,4 @@ def extract_first_column(file_path, output_file):
 
 # 使用示例
 extract_first_column("E:\\FILES\\WorkSpace\\Coding\\project\\songSim\\StyleListTabDelimited2.Txt", 
-                     "E:\\FILES\\WorkSpace\\Coding\\project\\songSim\\StyleListTabDelimited2output.txt")
+                     "E:\\FILES\\WorkSpace\\Coding\\project\\songSim\\StyleListTabDelimited2downloadList.txt")

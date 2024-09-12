@@ -12,6 +12,7 @@ import subprocess
 import platform
 from scipy.spatial.distance import euclidean, cosine
 from feature_manager_gai import feature_manager_instance  # 导入 FeatureManager 实例
+import multiprocessing
 
 # 音频特征提取函数
 def extract_features(file_path, stop_event):
@@ -106,7 +107,7 @@ def calculate_similarity(file_path, target_features, features):
     for feature in ['mfcc', 'chroma']:
         if feature in target_features and feature in features:
             # distance = np.linalg.norm(target_features[feature] - features[feature])
-            distance = 1/(1 - cosine(target_features[feature], features[feature]))
+            distance = abs(1/(1 - cosine(target_features[feature], features[feature])))
             similarity_scores.append(distance)
     
     if similarity_scores:
@@ -294,12 +295,16 @@ class AudioSimilarityApp(tk.Tk):
 
     def copy_file_name(self):
         selected_item = self.listbox_result.get(self.listbox_result.curselection())
-        file_name = selected_item.split(" - ")[0]
-        file_name = file_name.split('.')[0]
-        file_name = file_name.split(']')[1].strip()
+        if selected_item.startswith('['):
+            file_name = selected_item.split(" - ")[0]
+            file_name = file_name.split('.')[0]
+            file_name = file_name.split(']')[1].strip()
+        else:
+            file_name = selected_item
         copy_to_clipboard(file_name)
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     app = AudioSimilarityApp()
     app.mainloop()
 
