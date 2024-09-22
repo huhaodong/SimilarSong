@@ -57,7 +57,7 @@ class FeatureManager:
     # 判断当前系统类型并执行路径格式转换
     def convert_path_for_platform(self, path):
         if os.name == 'posix':  # macOS 或 Linux
-            return convert_to_unix_path(path)
+            return self.convert_to_unix_path(path)
         elif os.name == 'nt':  # Windows
             return self.convert_to_windows_path(path)
         return path

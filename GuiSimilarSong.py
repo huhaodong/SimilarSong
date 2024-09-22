@@ -138,7 +138,7 @@ class AudioSimilarityApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Audio Similarity Finder")
-        self.geometry("430x780")
+        self.geometry("550x780")
 
         # 任务取消事件
         self.stop_event = threading.Event()
