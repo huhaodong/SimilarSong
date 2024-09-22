@@ -138,62 +138,108 @@ class AudioSimilarityApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Audio Similarity Finder")
-        self.geometry("500x680")
+        self.geometry("430x780")
 
         # 任务取消事件
         self.stop_event = threading.Event()
 
         # Target Audio File Selection
-        self.label_target = tk.Label(self, text="Target Audio File:")
+        self.label_target = tk.Label(self, text="需要寻找的文件:")
+        # self.label_target.grid(row=0, column=0, sticky=tk.N)
         self.label_target.pack(pady=5)
         self.entry_target = tk.Entry(self, width=50)
+        # self.entry_target.grid(row=1, column=0, sticky=tk.N)
         self.entry_target.pack(pady=5)
-        self.button_browse_target = tk.Button(self, text="Browse", command=self.browse_target)
+        self.button_browse_target = tk.Button(self, text="选择文件", command=self.browse_target)
+        # self.button_browse_target.grid(row=1, column=1, sticky=tk.N)
         self.button_browse_target.pack(pady=5)
 
         # Search Directory Selection
-        self.label_dir = tk.Label(self, text="Search Directory:")
+        self.label_dir = tk.Label(self, text="需要提取的文件夹根目录:")
+        # self.label_dir.grid(row=2, column=0, sticky=tk.N)
         self.label_dir.pack(pady=5)
         self.entry_dir = tk.Entry(self, width=50)
+        # self.entry_dir.grid(row=3, column=0, sticky=tk.N)
         self.entry_dir.pack(pady=5)
-        self.button_browse_dir = tk.Button(self, text="Browse", command=self.browse_directory)
+        self.button_browse_dir = tk.Button(self, text="选择目录", command=self.browse_directory)
+        # self.button_browse_dir.grid(row=3, column=1, sticky=tk.N)
         self.button_browse_dir.pack(pady=5)
 
         # Progress Bar and Label
-        self.progress_label = tk.Label(self, text="")
+        self.progress_label = tk.Label(self, text="待机中")
+        # self.progress_label.grid(row=4, column=0, columnspan=3, sticky=tk.N)
         self.progress_label.pack(pady=5)
         self.progress_bar = Progressbar(self, orient=tk.HORIZONTAL, length=400, mode='determinate')
+        # self.progress_bar.grid(row=5, column=0, columnspan=3, sticky=tk.N)
         self.progress_bar.pack(pady=5)
 
         # Cache Features Button
-        self.button_cache = tk.Button(self, text="Cache Audio Features", command=self.cache_features)
-        self.button_cache.pack(pady=10)
+        self.button_cache = tk.Button(self, text="特征提取", command=self.cache_features)
+        # self.button_cache.grid(row=6, column=0, columnspan=3, sticky=tk.N)
+        self.button_cache.pack(pady=5)
 
         # Find Similar Audios Button
-        self.button_find = tk.Button(self, text="Find Similar Audios", command=self.find_similar_audios)
-        self.button_find.pack(pady=10)
+        self.button_find = tk.Button(self, text="寻找相似音频", command=self.find_similar_audios)
+        # self.button_find.grid(row=7, column=0, columnspan=3, sticky=tk.N)
+        self.button_find.pack(pady=5)
 
         # Cancel Task Button
-        self.button_cancel = tk.Button(self, text="Cancel Task", command=self.cancel_task)
-        self.button_cancel.pack(pady=10)
+        self.button_cancel = tk.Button(self, text="取消", command=self.cancel_task)
+        # self.button_cancel.grid(row=8, column=0, columnspan=3, sticky=tk.N)
+        self.button_cancel.pack(pady=5)
 
         # Set Feature File Button
-        self.button_set_feature_file = tk.Button(self, text="Set Feature File", command=self.set_feature_file)
-        self.button_set_feature_file.pack(pady=10)
+        self.button_set_feature_file = tk.Button(self, text="设置特征文件", command=self.set_feature_file)
+        # self.button_set_feature_file.grid(row=9, column=0, columnspan=3, sticky=tk.N)
+        self.button_set_feature_file.pack(pady=5)
+
+        # 替换根文件夹路径按钮
+        self.button_set_root_path = tk.Button(self, text="设置替换的目标路径", command=self.select_new_root_path)
+        # self.button_set_root_path.grid(row=10, column=0, columnspan=3, sticky=tk.N)
+        self.button_set_root_path.pack(pady=5)
+
+        # 选择原路径根目录文件夹
+        self.button_set_root_name = tk.Button(self, text="设置源路径根目录名", command=self.select_new_root_name)
+        # self.button_set_root_name.grid(row=11, column=0, columnspan=3, sticky=tk.N)
+        self.button_set_root_name.pack(pady=5)
+
+        # 当前替换路径
+        self.label_current_new_folder_path = tk.Label(self, text=f"当前替换的目标路径: {feature_manager_instance.new_folder_path}")
+        # self.label_current_new_folder_path.grid(row=12, column=0, columnspan=3, sticky=tk.N)
+        self.label_current_new_folder_path.pack(pady=5)
+
+        # 当前替换路径根目录
+        self.label_current_root_name = tk.Label(self, text=f"需要替换的旧路径的根目录 : {feature_manager_instance.new_root_name}")
+        # self.label_current_root_name.grid(row=13, column=0, columnspan=3, sticky=tk.N)
+        self.label_current_root_name.pack(pady=5)
 
         # Feature File Display
-        self.label_feature_file = tk.Label(self, text="Current Feature File: Not set")
+        self.label_feature_file = tk.Label(self, text="当前使用的特征文件: Not set")
+        # self.label_feature_file.grid(row=14, column=0, columnspan=3, sticky=tk.N)
         self.label_feature_file.pack(pady=5)
 
         # Result Display
         self.listbox_result = tk.Listbox(self, height=8, width=60)
+        # self.listbox_result.grid(row=15, column=0, columnspan=3, sticky=tk.N)
         self.listbox_result.pack(pady=5)
         self.listbox_result.bind("<Double-1>", self.play_audio)
         self.listbox_result.bind("<Button-3>", self.show_context_menu)  # 右键点击事件
 
         # 创建右键菜单
         self.context_menu = tk.Menu(self, tearoff=0)
-        self.context_menu.add_command(label="Copy File Name", command=self.copy_file_name)
+        self.context_menu.add_command(label="复制", command=self.copy_file_name)
+
+    # 选择需要替换的路径
+    def select_new_root_path(self):
+        folder_selected = filedialog.askdirectory()
+        feature_manager_instance.save_new_folder_path_settings(folder_path=folder_selected)
+        self.label_current_new_folder_path.config(text=f"当前替换的目标路径: {folder_selected}")
+    
+    # 选择原路径上的根目录名称
+    def select_new_root_name(self):
+        root_name = simpledialog.askstring("根目录名称", "输入旧路径中的根目录名称:")
+        feature_manager_instance.save_root_name_settings(root_name=root_name)
+        self.label_current_root_name.config(text=f"需要替换的旧路径的根目录 : {root_name}")
 
     def browse_target(self):
         target_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.mp3 *.wav *.flac *.ogg")])
@@ -255,6 +301,51 @@ class AudioSimilarityApp(tk.Tk):
         similarities = find_top_n_similar_audios(target_file, top_n, self.progress_bar, self.progress_label, self.stop_event)
         self.run_find_similar_continue(similarities)
 
+    # 将原本的路径进行替换
+    def remap_paths(self, path):
+        # 获取用户输入的路径、原始根文件夹名称以及新的根路径
+        old_path = path
+        root_folder_name = feature_manager_instance.new_root_name
+        new_root_path = feature_manager_instance.new_folder_path
+
+        # 校验用户输入
+        if new_root_path == "" or root_folder_name == "":
+            print("没有设置替换路径或根文件夹名称")
+            return path
+
+        if not old_path or not root_folder_name or not new_root_path:
+            print("输入错误", "请确保所有输入框已填写完整并选择了新的根路径")
+            return path
+
+        # 处理输入路径，将 Windows 风格路径转换为 macOS/Linux 风格路径
+        old_path = feature_manager_instance.convert_path_for_platform(old_path)
+
+        # 检查输入的路径是否包含指定的根文件夹名称
+        if root_folder_name not in old_path:
+            print("路径错误", "指定的根文件夹名称不在输入的路径中")
+            return path
+
+        try:
+            # 替换路径中的根文件夹为新的路径
+            index = old_path.index(root_folder_name)
+            new_path = os.path.join(new_root_path, old_path[index + len(root_folder_name):].lstrip(os.sep))
+
+            # 根据当前平台，调整新路径的格式
+            new_path = feature_manager_instance.convert_path_for_platform(new_path)
+
+            # 保存当前设置
+            # save_settings(root_folder_name, new_root_path)
+
+            # 更新当前设置显示
+            # update_current_settings()
+
+            # 显示重映射后的路径
+            # messagebox.showinfo("重映射成功", f"原路径:\n{old_path}\n\n新路径:\n{new_path}")
+        except Exception as e:
+            print("错误", f"发生错误: {str(e)}")
+
+        return new_path
+
     def run_find_similar_continue(self, top_n_similar_files):
         if not top_n_similar_files:
             self.progress_label.config(text="No similar files found.")
@@ -263,9 +354,10 @@ class AudioSimilarityApp(tk.Tk):
         self.listbox_result.delete(0, tk.END)
         count = 1
         for file_path, similarity in top_n_similar_files:
-            file_name = os.path.basename(file_path)  # 只显示文件名
+            new_path = self.remap_paths(file_path)
+            file_name = os.path.basename(new_path)  # 只显示文件名
             self.listbox_result.insert(tk.END, f"[{count}] {file_name} - Distence: {similarity:.4f}")
-            self.listbox_result.insert(tk.END, file_path)  # 隐藏文件路径，用于打开文件
+            self.listbox_result.insert(tk.END, new_path)  # 隐藏文件路径，用于打开文件
             self.listbox_result.itemconfig(tk.END, {'foreground': 'white'})  # 隐藏文本
             count += 1
 
