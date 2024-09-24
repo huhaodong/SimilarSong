@@ -64,7 +64,7 @@ def cache_audio_features(search_path, feature_file, progress_bar, progress_label
         progress_label.config(text="Task cancelled!")
 
 # 相似音频查找函数
-def find_top_n_similar_audios(target_file, top_n, progress_bar, progress_label, stop_event):
+def find_top_n_similar_audios(target_file, top_n, progress_bar, progress_label, stop_event, th_n):
     target_features = extract_features(target_file, stop_event)
     if target_features is None:
         return []
@@ -74,7 +74,7 @@ def find_top_n_similar_audios(target_file, top_n, progress_bar, progress_label, 
     current_progress = 0
     
     similarities = []
-    with ProcessPoolExecutor(max_workers=15) as executor:
+    with ProcessPoolExecutor(max_workers=th_n) as executor:
         future_to_file = {executor.submit(calculate_similarity, file_path, target_features, features): file_path for file_path, features in cached_features.items()}
         
         for future in as_completed(future_to_file):
@@ -285,9 +285,14 @@ class AudioSimilarityApp(tk.Tk):
 
         self.label_feature_file.config(text=f"Current Feature File: {feature_manager_instance.get_feature_file()}")
 
-        top_n = simpledialog.askinteger("Top N", "Enter the number of top similar files to find:", initialvalue=10, minvalue=1, maxvalue=100)
+        top_n = simpledialog.askinteger("最相似的n个结果", "输入需要列出多少个相似结果:", initialvalue=10, minvalue=1, maxvalue=100)
         if not top_n:
             return
+        
+        # 设置线程个数
+        th_n = simpledialog.askinteger("线程数", "输入线程个数:", initialvalue=15, minvalue=1, maxvalue=100)
+        if not th_n:
+            th_n = 15
 
         self.stop_event.clear()
         self.progress_bar['value'] = 0
@@ -295,10 +300,10 @@ class AudioSimilarityApp(tk.Tk):
         self.update()
 
         # 使用线程来执行音频匹配任务
-        threading.Thread(target=self.find_similar_audios_in_thread, args=(target_file, top_n)).start()
+        threading.Thread(target=self.find_similar_audios_in_thread, args=(target_file, top_n, th_n)).start()
 
-    def find_similar_audios_in_thread(self, target_file, top_n):
-        similarities = find_top_n_similar_audios(target_file, top_n, self.progress_bar, self.progress_label, self.stop_event)
+    def find_similar_audios_in_thread(self, target_file, top_n, th_n):
+        similarities = find_top_n_similar_audios(target_file, top_n, self.progress_bar, self.progress_label, self.stop_event, th_n)
         self.run_find_similar_continue(similarities)
 
     # 将原本的路径进行替换
@@ -351,7 +356,16 @@ class AudioSimilarityApp(tk.Tk):
             self.progress_label.config(text="No similar files found.")
             return
 
+        target_file = self.entry_target.get() # 原曲路径
+
         self.listbox_result.delete(0, tk.END)
+
+        source_path = self.remap_paths(target_file)
+        file_name = os.path.basename(source_path)  # 只显示文件名
+        self.listbox_result.insert(tk.END, f">>> 双击我试听原音频 - {file_name}")
+        self.listbox_result.insert(tk.END, source_path)  # 隐藏文件路径，用于打开文件
+        self.listbox_result.itemconfig(tk.END, {'foreground': 'white'})  # 隐藏文本
+        
         count = 1
         for file_path, similarity in top_n_similar_files:
             new_path = self.remap_paths(file_path)
@@ -372,6 +386,9 @@ class AudioSimilarityApp(tk.Tk):
         if selected_item:
             file_path_index = selected_item[0] + 1  # 获取隐藏的路径行
             if "Distence" in self.listbox_result.get(selected_item):  # 确保选择的是显示相似度的行
+                file_path = self.listbox_result.get(file_path_index)
+                open_audio_file(file_path)
+            elif ">>> 双击我试听原音频" in self.listbox_result.get(selected_item):
                 file_path = self.listbox_result.get(file_path_index)
                 open_audio_file(file_path)
 

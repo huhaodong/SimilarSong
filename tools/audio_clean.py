@@ -5,8 +5,8 @@ from tqdm import tqdm  # 进度条库
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 定义输入输出文件夹路径
-input_folder = r'E:\FILES\WorkSpace\music_work\wenjie'  # 原始音频文件夹路径
-output_folder = r'E:\FILES\WorkSpace\music_work\audio_clear'  # 清洗后音频保存的文件夹路径
+input_folder = r'F:\这个文件夹'  # 原始音频文件夹路径
+output_folder = r'F:\audio_clear'  # 清洗后音频保存的文件夹路径
 
 # 定义线程池的线程数量
 num_threads = 10  # 可根据系统的性能调节这个值
